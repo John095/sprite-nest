@@ -6,28 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Asset {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string;
-  category: '3D' | 'animation' | 'audio';
-  engine: 'Unity' | 'Unreal' | 'Other';
-  price: number;
-  license: 'CC0' | 'commercial';
-  file_url: string;
-  created_at: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-  created_at: string;
-}
-
-
-  export type Database = {
+export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
@@ -37,47 +16,71 @@ export interface User {
     Tables: {
       assets: {
         Row: {
-          category: string | null
+          category: string
+          created_at: string | null
           description: string | null
           engine: string | null
           file_url: string | null
-          id: number
+          id: string
           license: string | null
           price: number | null
-          title: string | null
-          user_id: number
-          created_at: string
+          thumbnail_url: string | null
+          title: string
+          user_id: string
         }
         Insert: {
-          category?: string | null
+          category: string
+          created_at?: string | null
           description?: string | null
           engine?: string | null
           file_url?: string | null
-          id?: number
+          id?: string
           license?: string | null
           price?: number | null
-          title?: string | null
-          user_id: number
-          created_at?: string
+          thumbnail_url?: string | null
+          title: string
+          user_id: string
         }
         Update: {
-          category?: string | null
+          category?: string
+          created_at?: string | null
           description?: string | null
           engine?: string | null
           file_url?: string | null
-          id?: number
+          id?: string
           license?: string | null
           price?: number | null
-          title?: string | null
-          user_id?: number
-          created_at?: string
+          thumbnail_url?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      downloads: {
+        Row: {
+          asset_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "assets_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
+            foreignKeyName: "downloads_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
             referencedColumns: ["id"]
           },
         ]
@@ -241,3 +244,17 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+export type Asset = {
+    id: string;
+    user_id: string;
+    title: string;
+    description: string | null;
+    category: string;
+    engine: string | null;
+    price: number;
+    license: string | null;
+    file_url: string | null;
+    thumbnail_url: string | null;
+    created_at: string;
+};

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { supabaseClient } from '../lib/supabase/client';
+import { supabase } from '../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 interface AuthFormProps {
@@ -17,7 +17,7 @@ export default function AuthForm({ type }: AuthFormProps) {
     const handleSubmit = async () => {
         setError(null);
         if (type === 'signup') {
-            const { error } = await supabaseClient.auth.signUp({
+            const { error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: { data: { username } },
@@ -27,7 +27,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 return;
             }
         } else {
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) {
                 setError(error.message);
                 return;
