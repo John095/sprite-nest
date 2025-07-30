@@ -1,22 +1,34 @@
-import { supabaseClient } from '../supabase/client';
+import { supabase } from '../supabase/client';
 import type { Asset } from '../types';
 
-export async function createAsset(userId: string, assetData: Omit<Asset, 'id' | 'user_id' | 'created_at'>): Promise<Asset> {
-  const { data, error } = await supabaseClient
+export async function createAsset(
+  userId: string,
+  assetData: Omit<Asset, 'id' | 'user_id' | 'created_at'>
+): Promise<Asset> {
+  const { data, error } = await supabase
     .from('assets')
-    .insert([{ user_id: userId, ...assetData }])
+    .insert([{ 
+      user_id: userId, 
+      ...assetData,
+      price: assetData.price ?? null // Ensure price is properly passed
+    }])
     .select()
     .single();
+    
   if (error) throw new Error(error.message);
-  return data;
+  return data as Asset; // Explicit type assertion
 }
 
-export async function getAssets(filters: Partial<Pick<Asset, 'category' | 'engine'>> & { search?: string }): Promise<Asset[]> {
-  let query = supabaseClient.from('assets').select('*');
+export async function getAssets(
+  filters: Partial<Pick<Asset, 'category' | 'engine'>> & { search?: string }
+): Promise<Asset[]> {
+  let query = supabase.from('assets').select('*');
+  
   if (filters.category) query = query.eq('category', filters.category);
   if (filters.engine) query = query.eq('engine', filters.engine);
   if (filters.search) query = query.ilike('title', `%${filters.search}%`);
+  
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return data;
+  return data as Asset[]; // Explicit type assertion
 }

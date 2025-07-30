@@ -1,7 +1,7 @@
-import { supabaseClient } from '../supabase/client';
+import { supabase } from '../supabase/client';
 
 export async function logDownload(assetId: string, userId?: string) {
-  const { error } = await supabaseClient
+  const { error } = await supabase
     .from('downloads')
     .insert([{ asset_id: assetId, user_id: userId || 'anonymous' }]);
   if (error) throw new Error(error.message);

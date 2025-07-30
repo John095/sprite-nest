@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { supabaseClient } from '../lib/supabase/client';
+import { supabase } from '../lib/supabase/client';
 
 import { User } from '../lib/types';
 
@@ -10,18 +10,18 @@ export default function Navbar() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
         };
         fetchUser();
-        const { data: authListener } = supabaseClient.auth.onAuthStateChange((_, session) => {
+        const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
             setUser(session?.user ?? null);
         });
         return () => authListener.subscription.unsubscribe();
     }, []);
 
     const handleLogout = async () => {
-        await supabaseClient.auth.signOut();
+        await supabase.auth.signOut();
         setUser(null);
     };
 

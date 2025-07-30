@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { logDownload } from '../../../lib/models/download';
 import { requireAuth } from '../../../lib/middleware/auth';
 
-export async function POST(request: Request) {
+import type { NextRequest } from 'next/server';
+
+export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth(request);
     const { assetId } = await request.json();

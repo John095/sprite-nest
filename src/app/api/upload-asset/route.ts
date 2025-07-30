@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '../../../lib/supabase/server';
+import { createServerSupabaseClient } from '../../../lib/supabase/server';
 import { createAsset } from '../../../lib/models/asset';
 import { requireAuth } from '../../../lib/middleware/auth';
 
 import type { NextRequest } from 'next/server';
 
+function isUser(obj: unknown): obj is { id: string } {
+  return typeof obj === 'object' && obj !== null && 'id' in obj;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth(request);
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    if (!isUser(user)) return user;
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
@@ -19,10 +24,12 @@ export async function POST(request: NextRequest) {
     const price = parseFloat(formData.get('price') as string);
     const license = formData.get('license') as 'CC0' | 'commercial';
 
-    const supabase = createSupabaseServerClient();
+    const supabase = createServerSupabaseClient();
+
     const { data, error } = await supabase.storage
       .from('assets')
       .upload(`public/${user.id}/${file.name}`, file);
+      
     if (error) throw new Error(error.message);
 
     const asset = await createAsset(user.id, {
@@ -33,6 +40,7 @@ export async function POST(request: NextRequest) {
       price,
       license,
       file_url: data.path,
+      thumbnail_url: null,
     });
 
     return NextResponse.json({ message: 'Asset uploaded', asset }, { status: 201 });

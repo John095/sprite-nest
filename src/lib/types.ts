@@ -252,9 +252,16 @@ export type Asset = {
     description: string | null;
     category: string;
     engine: string | null;
-    price: number;
+    price: number | null;
     license: string | null;
     file_url: string | null;
     thumbnail_url: string | null;
     created_at: string;
 };
+
+export interface User {
+    id: string;
+    email?: string;
+    username?: string;
+    created_at: string;
+}
